@@ -24,17 +24,10 @@ export default function App() {
   });
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activeSession = sessions.find((s) => s.id === activeId);
-
-  useEffect(() => {
-    const handleResize = () => setSidebarOpen(window.innerWidth >= 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     localStorage.setItem('hacker_gpt_sessions', JSON.stringify(sessions));
@@ -136,28 +129,21 @@ export default function App() {
         <div className="fixed inset-0 bg-black/80 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <div className={cn(
-        "fixed md:relative z-50 h-full transition-all duration-300",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
-        sidebarOpen ? "w-64" : "w-0"
-      )}>
-        <Sidebar 
-          sessions={sessions} 
-          activeSessionId={activeId} 
-          onNewChat={handleNewChat} 
-          onSelectSession={(id) => {
-            setActiveId(id);
-            if(window.innerWidth < 768) setSidebarOpen(false);
-          }} 
-          onClose={() => setSidebarOpen(false)}
-        />
-      </div>
+      <Sidebar 
+        sessions={sessions} 
+        activeSessionId={activeId} 
+        onNewChat={handleNewChat} 
+        onSelectSession={setActiveId} 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       <main className="flex-1 flex flex-col relative h-full bg-hacker-black z-10 transition-all duration-300">
         {/* Top Navbar */}
-        <header className="h-16 border-b border-neon-green/20 flex items-center justify-between px-4 md:px-8 bg-hacker-black/80 backdrop-blur-md">
+        <header id="app-header" className="h-16 border-b border-neon-green/20 flex items-center justify-between px-4 md:px-8 bg-hacker-black/80 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <button 
+              id="sidebar-toggle-button"
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 text-neon-green hover:bg-neon-green/10 rounded"
             >
