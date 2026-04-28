@@ -9,12 +9,23 @@ interface SidebarProps {
   activeSessionId: string | null;
   onNewChat: () => void;
   onSelectSession: (id: string) => void;
+  onClose: () => void;
 }
 
-export function Sidebar({ sessions, activeSessionId, onNewChat, onSelectSession }: SidebarProps) {
+export function Sidebar({ sessions, activeSessionId, onNewChat, onSelectSession, onClose }: SidebarProps) {
   return (
     <aside className="w-64 bg-hacker-grey border-r border-neon-green/30 flex flex-col h-full">
-      <div className="p-6">
+      <div className="p-6 relative">
+        <button 
+          className="md:hidden absolute top-0 right-0 p-6 text-neon-green/60 hover:text-neon-green text-2xl flex items-center justify-center min-w-[60px] min-h-[60px]" 
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log("Close button clicked");
+            onClose();
+          }}
+        >
+          ✕
+        </button>
         <Logo className="mb-8" />
         
         <button

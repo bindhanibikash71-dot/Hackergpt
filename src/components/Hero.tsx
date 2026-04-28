@@ -22,7 +22,7 @@ export function Hero() {
           <span className="text-[10px] uppercase tracking-widest text-neon-green font-bold">Restricted Access Level 07</span>
         </div>
         
-        <h1 className="text-6xl font-black uppercase tracking-tight leading-none text-white">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-none text-white">
           Welcome to <span className="text-neon-green glow-text">HackerGPT</span>
         </h1>
         

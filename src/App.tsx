@@ -24,9 +24,17 @@ export default function App() {
   });
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const activeSession = sessions.find((s) => s.id === activeId);
+
+  useEffect(() => {
+    const handleResize = () => setSidebarOpen(window.innerWidth >= 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('hacker_gpt_sessions', JSON.stringify(sessions));
@@ -47,6 +55,7 @@ export default function App() {
     };
     setSessions([newSession, ...sessions]);
     setActiveId(newSession.id);
+    if(window.innerWidth < 768) setSidebarOpen(false);
   };
 
   const handleSendMessage = async (content: string) => {
@@ -123,18 +132,42 @@ export default function App() {
         <span className="text-[120px] font-black whitespace-nowrap">BIKASH BINDHANI</span>
       </div>
 
-      <Sidebar 
-        sessions={sessions} 
-        activeSessionId={activeId} 
-        onNewChat={handleNewChat} 
-        onSelectSession={setActiveId} 
-      />
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/80 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
 
-      <main className="flex-1 flex flex-col relative h-full bg-hacker-black z-10">
+      <div className={cn(
+        "fixed md:relative z-50 h-full transition-all duration-300",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+        sidebarOpen ? "w-64" : "w-0"
+      )}>
+        <Sidebar 
+          sessions={sessions} 
+          activeSessionId={activeId} 
+          onNewChat={handleNewChat} 
+          onSelectSession={(id) => {
+            setActiveId(id);
+            if(window.innerWidth < 768) setSidebarOpen(false);
+          }} 
+          onClose={() => setSidebarOpen(false)}
+        />
+      </div>
+
+      <main className="flex-1 flex flex-col relative h-full bg-hacker-black z-10 transition-all duration-300">
         {/* Top Navbar */}
-        <header className="h-16 border-b border-neon-green/20 flex items-center justify-between px-8 bg-hacker-black/80 backdrop-blur-md">
-          <div className="flex items-center gap-4">
-            <span className="text-[10px] uppercase tracking-widest opacity-60 text-neon-green">System Status:</span>
+        <header className="h-16 border-b border-neon-green/20 flex items-center justify-between px-4 md:px-8 bg-hacker-black/80 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 text-neon-green hover:bg-neon-green/10 rounded"
+            >
+              <div className="flex flex-col gap-1">
+                <span className="w-5 h-0.5 bg-current"></span>
+                <span className="w-5 h-0.5 bg-current"></span>
+                <span className="w-5 h-0.5 bg-current"></span>
+              </div>
+            </button>
+            <span className="hidden md:inline text-[10px] uppercase tracking-widest opacity-60 text-neon-green">System Status:</span>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-neon-green shadow-[0_0_5px_#00FF41] animate-pulse"></div>
               <span className="text-[10px] uppercase tracking-tighter text-neon-green">Neural Link Active</span>
